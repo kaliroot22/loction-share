@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Location Share</title>
+</head>
+<body>
+  <h1>Location Share</h1>
+  <p>अपनी लोकेशन साझा करने के लिए नीचे बटन दबाएँ।</p>
+  <button id="share">मेरी लोकेशन प्राप्त करें</button>
+  <p id="result">अभी लोकेशन प्राप्त नहीं हुई है।</p>
+
+  <script>
+    document.getElementById("share").onclick = () => {
+      const result = document.getElementById("result");
+
+      if (!navigator.geolocation) {
+        result.textContent = "आपका ब्राउज़र लोकेशन सपोर्ट नहीं करता।";
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          result.textContent =
+            "Latitude: " + position.coords.latitude +
+            ", Longitude: " + position.coords.longitude;
+        },
+        () => {
+          result.textContent =
+            "लोकेशन नहीं मिली। ब्राउज़र की अनुमति जाँचें।";
+        }
+      );
+    };
+  </script>
+</body>
+</html>
