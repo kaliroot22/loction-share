@@ -4,34 +4,94 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Location Share</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+      line-height: 1.6;
+    }
+
+    button {
+      padding: 12px 18px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    #result {
+      margin-top: 20px;
+      overflow-wrap: anywhere;
+    }
+  </style>
 </head>
 <body>
   <h1>Location Share</h1>
-  <p>अपनी लोकेशन साझा करने के लिए नीचे बटन दबाएँ।</p>
+  <p>अपनी लोकेशन प्राप्त करने के लिए नीचे बटन दबाएँ।</p>
+
   <button id="share">मेरी लोकेशन प्राप्त करें</button>
   <p id="result">अभी लोकेशन प्राप्त नहीं हुई है।</p>
 
   <script>
-    document.getElementById("share").onclick = () => {
-      const result = document.getElementById("result");
+    const button = document.getElementById("share");
+    const result = document.getElementById("result");
 
+    button.addEventListener("click", () => {
       if (!navigator.geolocation) {
         result.textContent = "आपका ब्राउज़र लोकेशन सपोर्ट नहीं करता।";
         return;
       }
 
+      result.textContent = "लोकेशन की अनुमति का इंतजार है...";
+      button.disabled = true;
+
       navigator.geolocation.getCurrentPosition(
         (position) => {
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+
           result.textContent =
-            "Latitude: " + position.coords.latitude +
-            ", Longitude: " + position.coords.longitude;
+            "लोकेशन सफलतापूर्वक प्राप्त हुई। Latitude: " +
+            latitude + ", Longitude: " + longitude;
+
+          const mapLink =
+            "https://www.google.com/maps?q=" +
+            latitude + "," + longitude;
+
+          const link = document.createElement("a");
+          link.href = mapLink;
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          link.textContent = "Google Maps पर लोकेशन देखें";
+
+          result.appendChild(document.createElement("br"));
+          result.appendChild(link);
+          button.disabled = false;
         },
-        () => {
-          result.textContent =
-            "लोकेशन नहीं मिली। ब्राउज़र की अनुमति जाँचें।";
+        (error) => {
+          if (error.code === 1) {
+            result.textContent =
+              "लोकेशन की अनुमति नहीं मिली। ब्राउज़र सेटिंग में Location Allow करें।";
+          } else if (error.code === 2) {
+            result.textContent =
+              "लोकेशन उपलब्ध नहीं है। GPS और फोन की Location चालू करें।";
+          } else if (error.code === 3) {
+            result.textContent =
+              "समय समाप्त हुआ। दोबारा प्रयास करें।";
+          } else {
+            result.textContent = "लोकेशन प्राप्त नहीं हुई। दोबारा प्रयास करें।";
+          }
+
+          button.disabled = false;
+        },
+        {
+          enableHighAccuracy: true,
+          timeout: 30000,
+          maximumAge: 0
         }
       );
-    };
+    });
   </script>
 </body>
 </html>
+Google Maps
+Find local businesses, view maps and get driving directions in Google Maps.
+
